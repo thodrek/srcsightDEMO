@@ -56,9 +56,16 @@ Lately there has been a rapid increase in the number of data sources and public 
 
 
 \section{Introduction}
-Data integration has been the topic of intensive research for a
+Data integration and data cleaning remain among the most cost-intensive tasks in data management, either due to the increased computation and human-labor costs involved in the process~\cite{kruse2015estimating} or the monetary cost involved in acquiring data from different sources~\cite{balazinska:vldb11}. Given the high number of available data sources and the aforementioned costs, it is challenging for a user to identify the sources that are truly beneficial to her application. This gives rise to the natural question of how can one discover {\em the most beneficial sources} for integration, i.e., sources that maximize the user's benefit at the minimum cost. 
+
+Several approaches have been proposed to help users reason about the value of integrating multiple data sources. The proposed approaches can be divided in two main categories: (i) {\em effort-oriented} techniques that focus on characterizing solely the cost of integration, and (ii) data-oriented techniques that reason about the benefit of integration. Techniques from the first category estimate the cost of integration via reasoning about the effort required to perform schema-matching, data-cleaning and data-transformations when integrating multiple sources~\cite{kruse2015estimating, smith:2009}. The main limitation of th Here, the sources are {\em fixed}, assuming that the user has already specified the sources that are relevant to her query and given the estimated integration cost 
+
+describe \system and its unique contributions, i.e., functionalities for the users.
+
+organization of the demo
 
 \section{Selecting Sources for Integration}
+
 analyze the content of sources, identify the domains that sources cover and materialize quality profiles. 
 
 Different quality metrics available 
