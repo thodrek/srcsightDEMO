@@ -16,7 +16,7 @@
 
 % ****************** TITLE ****************************************
 
-\title{{\LARGE \system}: Discovering Valuable Sources for Integration}
+\title{{\LARGE \system}: Deciding Which Sources to Integrate}
 
 \numberofauthors{5} 
 
@@ -51,7 +51,7 @@ Lise Getoor\\
 \maketitle
 
 \begin{abstract}
-Lately there has been a rapid increase in the number of data sources and public access data services, such as cloud-based data markets and data portals, that facilitate the collection, publishing and trading of data. Data sources typically exhibit large heterogeneity in the type and quality of data they provide. Unfortunately, when the number of data sources is large, humans have a limited capability of reasoning about the actual usefulness of sources and the trade-offs between the benefits and costs of acquiring and integrating sources. In this demonstration we present \system , a framework that facilitates the exploration and selection of sources for integration. \system is based on the intuition that different sets of data sources are optimal to integrate for different integration tasks. The main focus of \system is to allow users to discover and explore valuable sets of sources for diverse integration tasks over real-world event-data sources.
+Lately there has been a rapid increase in the number of data sources and public access data services, such as cloud-based data markets and data portals, that facilitate the collection, publishing and trading of data. Data sources typically exhibit large heterogeneity in the type and quality of data they provide. Unfortunately, when the number of data sources is large, humans have a limited capability of reasoning about the actual usefulness of sources and the trade-offs between the benefits and costs of acquiring and integrating sources. In this demonstration we present \system, a framework that facilitates the exploration and selection of sources for integration. \system~is based on the intuition that different sets of data sources are optimal to integrate for different integration tasks. The main focus of \system~is on allowing users to discover and explore valuable sets of sources for diverse integration tasks over larger numbers of diverse data sources.
 \end{abstract}
 
 
@@ -64,7 +64,17 @@ describe \system and its unique contributions, i.e., functionalities for the use
 
 organization of the demo
 
-\section{Selecting Sources for Integration}
+\section{Discovering Valuable Sources}
+  We consider a scenario where users interact with a system that stores and manages data sources under a single repository and want to identify sources relevant to a desired integration task. Examples of such repositories may correspond to data marketplaces~\cite{balazinska:vldb11}, data portals, such as Datasift\footnote{http://datasift.com/}, or online platforms for organizing, managing and sharing datasets~\cite{datahub}. In this section we describe the main functionalities that such systems should support to allow users to disover sources that are the most beneficial for a desired integration task. 
+
+\subsection{Describing the Integration Task}
+Typically a user would start by proving a description of her desired integration task as well as the 
+  Such a system should allow users to describe their desired integration task as well as any requirements (e.g., requirements on the quality or effort of integration) accompanying it. Given a description of an integration task a data 
+
+
+\subsection{Multi-variate Source Selection}
+
+\subsection{Providing Explanations}
 
 analyze the content of sources, identify the domains that sources cover and materialize quality profiles. 
 
@@ -76,9 +86,12 @@ Oracle provides the quality profiles of sources for the specified domain
 
 Perform source selection
 
-\section{Overview of the System}
+\section{{\Large \system} Design}
+In this section, we present the \system~architecture, starting with an overview followed by a detailed discussion of the different components. 
+\subsection{{\large \system}~architecture overview}
 
-Describe the system architecture to perform these operations
+\subsection{The Backend}
+\subsection{The Frontend}
 
 \section{Demo Details}
 
@@ -95,6 +108,5 @@ Allow users to remove and add sources
 
 \bibliographystyle{abbrv}
 \bibliography{srcsight}
-
 
 \end{document}
