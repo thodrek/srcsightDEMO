@@ -10,15 +10,16 @@
 \usepackage{cleveref}
 
 \newcommand\system{\textsc{SourceSight}}
+\newtheorem{definition}{Definition}
 
 
 \begin{document}
 
 % ****************** TITLE ****************************************
 
-\title{{\LARGE \system}: Deciding Which Sources to Integrate}
+\title{{\LARGE \system}: Enabling Effective Source Selection}
 
-\numberofauthors{5} 
+\numberofauthors{3} 
 
 \author{
 % 1st. author
@@ -64,17 +65,74 @@ describe \system and its unique contributions, i.e., functionalities for the use
 
 organization of the demo
 
-\section{Discovering Valuable Sources}
-  We consider a scenario where users interact with a system that stores and manages data sources under a single repository and want to identify sources relevant to a desired integration task. Examples of such repositories may correspond to data marketplaces~\cite{balazinska:vldb11}, data portals, such as Datasift\footnote{http://datasift.com/}, or online platforms for organizing, managing and sharing datasets~\cite{datahub}. In this section we describe the main functionalities that such systems should support to allow users to disover sources that are the most beneficial for a desired integration task. 
 
-\subsection{Describing the Integration Task}
-Typically a user would start by proving a description of her desired integration task as well as the 
-  Such a system should allow users to describe their desired integration task as well as any requirements (e.g., requirements on the quality or effort of integration) accompanying it. Given a description of an integration task a data 
+\section{Discovering Valuable Sources}
+We consider a scenario where users interact with a system that stores and manages data sources under a single repository and want to identify sources relevant to a desired integration task. Examples of such repositories may correspond to data marketplaces~\cite{balazinska:vldb11}, data portals, such as Datasift\footnote{http://datasift.com/}, or online platforms for organizing, managing and sharing datasets~\cite{datahub}. 
+
+Sources can exhibit large heterogeneity with respect to the data they provide. We assume that each entry in a source is associated with a set of {\em context literals} and all context literals come from a {\em literal dictionary} $V$. This dictionary $V$ may follow a structured form, e.g., be a knowledge-base, describing how different literals are related to each other. For example, if the source entries correspond to structured entries these literals may correspond to the values for a subset of attributes of each entry (e.g., the location value and business type value for business listings). If the source entry corresponds to unstructured free-text data, these literals may correspond to {\em real-world entities} or {\em concepts} from a knowledge-base. The aforementioned assumptions allow one to reason about the domain covered by each source by analyzing the union of context-literal sets associated with the entries of the source. 
+
+We also consider that a user integration task $I = (I_d, I_c)$ is fully specified by a description that corresponds to a context-literal set $I_d$ defining the {\em domain} of the task and potentially a set of integration cost or effort constraints $I_c$. Discovering the most valuable sources for task $I$ requires performing the following operations: (i) identifying the relevant sources for task $I$, (ii) discovering sets of sources that if integrated together will maximize the {\em benefit} of integration under the constraints $I_c$. 
+
+Relevant sources to task $I$ are all data sources that provide entries whose context-literal set is a subset of $I_d$. Not of all these sources may be beneficial for task $I$ as sources may provide stale or erroneous data~\cite{Dong_vldb:2009, li:2012}, or may provide duplicate data~\cite{bronzi:2013, li:2012} at different prices. In our recent work~\cite{dong:vldb13,rekatsinas:2014, rekatsinas:2015} we showed how
+, given a fixed data domain, the benefit of integration can be quantified using rigorous data quality metrics, such as {\em coverage}, {\em accuracy}, {\em timeliness} or {\em bias}, and introduced the paradigm of {\em source selection} to detect the most beneficial sources for integration by reasoning about the benefits and costs of acquiring and integrating data. 
+
+Consider an integration task $I = (I_d, I_c)$ and let $S$ denote the set of all sources relevant to $I$. Assume an oracle $\mathbf{G_q}(\cdot)$ that takes as input a set of sources $\bar{S}$ and a set of context-literals $I_d$ and returns the a vector containing the gain of integrating sources $\bar{S}$ with respect to the different quality metrics $q$. Moreover, let $C(\cdot)$ be an oracle that takes as input a set of sources $\bar{S}$ and returns the total integration cost. The result of source selection corresponds to a sets of sources $S_I$ such that $S_I = \arg\max_{\bar{S} \subseteq S}\mathbf{G_q}(\bar{S},I_d) - C(\bar{S})$.
+
+%\section{Discovering Valuable Sources}
+%  We consider a scenario where users interact with a system that stores and manages data sources under a single repository and want to identify sources relevant to a desired integration task. Examples of such repositories may correspond to data marketplaces~\cite{balazinska:vldb11}, data portals, such as Datasift\footnote{http://datasift.com/}, or online platforms for organizing, managing and sharing datasets~\cite{datahub}. In this section we describe the main functionalities that such systems needs to support to allow users to discover sources that are the most beneficial for a desired integration task. 
+%
+%\subsection{Reasoning about The Content of Sources}
+%Sources may exhibit large heterogeneity with respect to the data they provide. To reason about the content of sources we assume that each entry in a source is associated with a set of {\em context literals}. We assume that all context literals come from a {\em literal dictionary} $V$. Moreover, we assume that the dictionary $V$ may follow a structured form, e.g., be a knowledge-base, describing how different literals are related to each other. For example, if the source entries correspond to structured entries these literals may correspond to the values for a subset of attributes of each entry (e.g., the location value and business type value for business listings). If the source entry corresponds to unstructured free-text data, these literals may correspond to {\em real-world entities} or {\em concepts} from a knowledge-base. Following this assumption, a data-source repository can reason about the domain covered by each source by analyzing the union of context-literal sets associated with the entries of the source. 
+%
+%\subsection{Describing the Integration Task}
+%Typically a user would start by proving a description of her desired integration task as well as any requirements (e.g., requirements on the total effort of integration) characterizing the task. We assume that users can describe a desired integration task using a set of context literals that belong in the dictionary $V$. Integration-task requirements can correspond to constraints on the total number of sources used for integration or explicit budget constraints on the cost or total effort of integration.
+%
+%Given an integration task $I$ described by a  context-literal set $I_c$, the system can {\em recommend}.
+%
+%
+%\subsection{Multi-variate Source Selection}
+%Given a finalized integration task $I$ associated with a context-literal set $I_c$ the system automatically finds subsets of sources that, if integrated together, maximize the benefit of integration under the budget requirements of the user. If available, the system identifies multiple solutions that correspond to different trade-offs among different quality metrics.
+%
+%The discovered solutions are presented to the user together with a concise description of their quality characteristics as well as a description of the data sources included in each of thi think em. 
+%
+%\subsection{Providing Explanations}
+%
+%analyze the content of sources, identify the domains that sources cover and materialize quality profiles. 
+%
+%Different quality metrics available 
+%
+%Users provide a query that specifies a domain
+%
+%Oracle provides the quality profiles of sources for the specified domain
+%
+%Perform source selection
+
+\section{{\Large \system} Design}
+In this section, we present \system, a data source management system for effective source selection over large numbers of diverse data sources. In a recent paper~\cite{rekatsinas:2015}, we put forward our vision about the functionalities that data source management systems should support to facilitate effective source selection and the architecture they should follow. 
+\system~is a realization of our vision for such a system. Next, we describe \system's architecture, the different functionalities it supports and extensions of the preliminary design implemented in \system.%
+
+\subsection{Architecture overview}
+\system-is built as a layer on top of a data source repository, that stores the raw data of data sources. The architecture of \system~is presented in \Cref{fig:architecture}. The system consists of two components: a frontend and a backend. The frontend is a ``thin client'' that is used to specify integration tasks and display visualizations that aid users to select the desired sources for integration. The backend, in contrast, performs all the computation required to discover and select the most beneficial sources for integration.
+
+A user interacts with 
+
+\subsection{Reasoning about The Content of Sources}
+Sources may exhibit large heterogeneity with respect to the data they provide. To reason about the content of sources we assume that each entry in a source is associated with a set of {\em context literals}. We assume that all context literals come from a {\em literal dictionary} $V$. Moreover, we assume that the dictionary $V$ may follow a structured form, e.g., be a knowledge-base, describing how different literals are related to each other. For example, if the source entries correspond to structured entries these literals may correspond to the values for a subset of attributes of each entry (e.g., the location value and business type value for business listings). If the source entry corresponds to unstructured free-text data, these literals may correspond to {\em real-world entities} or {\em concepts} from a knowledge-base. Following this assumption, a data-source repository can reason about the domain covered by each source by analyzing the union of context-literal sets associated with the entries of the source. 
+
+\subsection{Specifying an Integration Task}
+Typically a user would start by proving a description of her desired integration task as well as any requirements (e.g., requirements on the total effort of integration) characterizing the task. We assume that users can describe a desired integration task using a set of context literals that belong in the dictionary $V$. Integration-task requirements can correspond to constraints on the total number of sources used for integration or explicit budget constraints on the cost or total effort of integration.
+
+Given an integration task $I$ described by a  context-literal set $I_c$, the system can {\em recommend}.
 
 
 \subsection{Multi-variate Source Selection}
+Given a finalized integration task $I$ associated with a context-literal set $I_c$ the system automatically finds subsets of sources that, if integrated together, maximize the benefit of integration under the budget requirements of the user. If available, the system identifies multiple solutions that correspond to different trade-offs among different quality metrics.
 
-\subsection{Providing Explanations}
+The discovered solutions are presented to the user together with a concise description of their quality characteristics as well as a description of the data sources included in each of thi think em. 
+
+\subsection{Extensions}
+Next, we discuss two extensions that \system.
+\subsubsection{Providing Explanations}
 
 analyze the content of sources, identify the domains that sources cover and materialize quality profiles. 
 
@@ -86,12 +144,8 @@ Oracle provides the quality profiles of sources for the specified domain
 
 Perform source selection
 
-\section{{\Large \system} Design}
-In this section, we present the \system~architecture, starting with an overview followed by a detailed discussion of the different components. 
-\subsection{{\large \system}~architecture overview}
+\subsubsection{Comparing and Contrasting Sets of Sources}
 
-\subsection{The Backend}
-\subsection{The Frontend}
 
 \section{Demo Details}
 
