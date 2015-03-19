@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{balance}  % for  \balance command ON LAST PAGE  (only there!)
 \usepackage{cleveref}
+\usepackage{times}
 
 \newcommand\system{\textsc{SourceSight}}
 \newtheorem{definition}{Definition}
@@ -112,25 +113,36 @@ In this section, we present \system, a data source management system for effecti
 \system~is a realization of our vision for such a system. Next, we describe \system's architecture, the different functionalities it supports and extensions of the preliminary design implemented in \system.%
 
 \subsection{Architecture overview}
-\system-is built as a layer on top of a data source repository, that stores the raw data of data sources. The architecture of \system~is presented in \Cref{fig:architecture}. The system consists of two components: a frontend and a backend. The frontend is a ``thin client'' that is used to specify integration tasks and display visualizations that aid users to select the desired sources for integration. The backend, in contrast, performs all the computation required to discover and select the most beneficial sources for integration.
+\system-is built as a layer on top of a data source repository, that stores the raw data of data sources. The system consists of three components: a frontend, a source analysis engine and a query engine. The frontend is a ``thin client'' that is used to specify integration tasks and display visualizations that aid users to select the desired sources for integration. The source analysis engine processes the raw data from the available data sources to identify the content of sources, and also evaluates their quality with respect to different quality metrics such as the ones describe in the previous section. Finally, the query engine takes as input user-specified requests and performs the necessary computation to serve those. The architecture of \system~is presented in \Cref{fig:architecture}. 
 
-A user interacts with 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fig/srcsightOver}
+    \caption{\system~architecture.}
+    \label{fig:architecture}
+\end{figure}
+
+The basic operations of \system can be divided into an {\em offline} phase and an {\em online} phase. During the offline phase, the source analysis module constructs an index describing both the content and the quality of each source with respect to multiple quality metrics. This index is used during the online phase when a user interacts with the system to serve the user requests. We discuss the indexing technique used further in \Cref{sec:reasoning} During the online phase users interact with \system~via its frontend module and user requests are served by the query engine. Users can specify a desired integration task by providing a free-text description of the context literals that describe the task. Once a description is provided users can choose among three main functionalities with respect to the specified integration task. They can either choose to explore which context literals and sources are highly relevant to the specified task, they can choose to perform source selection or they can choose to perform a qualitative comparison between different sets of sources constructed either manually or automatically via source selection. The first functionality allows a user to refine her integration task specification by exploring related contexts. It also allows users to obtain an overview of the quality of individual sources (see \Cref{sec:integtask}). The second functionality returns multiple recommended source selection solutions with respect to a variety of quality metrics (see \Cref{sec:sourcesel}). Finally, \system~allows users to compare and contrast different sets of sources to further understand the benefits of choosing a specific set and understand why the particular set was recommended by source selection (see \Cref{sec:extensions}). We now discuss the different components in detail.
 
 \subsection{Reasoning about The Content of Sources}
+\label{sec:reasoning}
 Sources may exhibit large heterogeneity with respect to the data they provide. To reason about the content of sources we assume that each entry in a source is associated with a set of {\em context literals}. We assume that all context literals come from a {\em literal dictionary} $V$. Moreover, we assume that the dictionary $V$ may follow a structured form, e.g., be a knowledge-base, describing how different literals are related to each other. For example, if the source entries correspond to structured entries these literals may correspond to the values for a subset of attributes of each entry (e.g., the location value and business type value for business listings). If the source entry corresponds to unstructured free-text data, these literals may correspond to {\em real-world entities} or {\em concepts} from a knowledge-base. Following this assumption, a data-source repository can reason about the domain covered by each source by analyzing the union of context-literal sets associated with the entries of the source. 
 
-\subsection{Specifying an Integration Task}
+\subsection{Specifying and Refining an Integration Task}
+\label{sec:integtask}
 Typically a user would start by proving a description of her desired integration task as well as any requirements (e.g., requirements on the total effort of integration) characterizing the task. We assume that users can describe a desired integration task using a set of context literals that belong in the dictionary $V$. Integration-task requirements can correspond to constraints on the total number of sources used for integration or explicit budget constraints on the cost or total effort of integration.
 
 Given an integration task $I$ described by a  context-literal set $I_c$, the system can {\em recommend}.
 
 
 \subsection{Multi-variate Source Selection}
+\label{sec:sourcesel}
 Given a finalized integration task $I$ associated with a context-literal set $I_c$ the system automatically finds subsets of sources that, if integrated together, maximize the benefit of integration under the budget requirements of the user. If available, the system identifies multiple solutions that correspond to different trade-offs among different quality metrics.
 
 The discovered solutions are presented to the user together with a concise description of their quality characteristics as well as a description of the data sources included in each of thi think em. 
 
 \subsection{Extensions}
+\label{sec:extensions}
 Next, we discuss two extensions that \system.
 \subsubsection{Providing Explanations}
 
