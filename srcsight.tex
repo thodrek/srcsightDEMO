@@ -67,7 +67,9 @@ describe \system and its unique contributions, i.e., functionalities for the use
 organization of the demo
 
 
+\newpage
 \section{Discovering Valuable Sources}
+\label{sec:sources}
 We consider a scenario where users interact with a system that stores and manages data sources under a single repository and want to identify sources relevant to a desired integration task. Examples of such repositories may correspond to data marketplaces~\cite{balazinska:vldb11}, data portals, such as Datasift\footnote{http://datasift.com/}, or online platforms for organizing, managing and sharing datasets~\cite{datahub}. 
 
 Sources can exhibit large heterogeneity with respect to the data they provide. We assume that each entry in a source is associated with a set of {\em context literals} and all context literals come from a {\em literal dictionary} $V$. This dictionary $V$ may follow a structured form, e.g., be a knowledge-base, describing how different literals are related to each other. For example, if the source entries correspond to structured entries these literals may correspond to the values for a subset of attributes of each entry (e.g., the location value and business type value for business listings). If the source entry corresponds to unstructured free-text data, these literals may correspond to {\em real-world entities} or {\em concepts} from a knowledge-base. The aforementioned assumptions allow one to reason about the domain covered by each source by analyzing the union of context-literal sets associated with the entries of the source. 
@@ -117,7 +119,7 @@ In this section, we present \system, a data source management system for effecti
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{fig/srcsightOver}
+    \includegraphics[width=0.48\textwidth]{fig/srcsightOver}
     \caption{\system~architecture.}
     \label{fig:architecture}
 \end{figure}
@@ -126,18 +128,49 @@ The basic operations of \system can be divided into an {\em offline} phase and a
 
 \subsection{Reasoning about The Content of Sources}
 \label{sec:reasoning}
-Sources may exhibit large heterogeneity with respect to the data they provide. To reason about the content of sources we assume that each entry in a source is associated with a set of {\em context literals}. We assume that all context literals come from a {\em literal dictionary} $V$. Moreover, we assume that the dictionary $V$ may follow a structured form, e.g., be a knowledge-base, describing how different literals are related to each other. For example, if the source entries correspond to structured entries these literals may correspond to the values for a subset of attributes of each entry (e.g., the location value and business type value for business listings). If the source entry corresponds to unstructured free-text data, these literals may correspond to {\em real-world entities} or {\em concepts} from a knowledge-base. Following this assumption, a data-source repository can reason about the domain covered by each source by analyzing the union of context-literal sets associated with the entries of the source. 
+As discussed in \Cref{sec:sources}, we assume that each source entry is associated with a set of context literals coming from a literal dictionary $V$. Moreover, we assume the existence of a {\em knowledge base} (or ontology) describing relations amongst the literals in $V$.  To reason about the content of different sources and their data quality we recently proposed augmenting such a knowledge base with a {\em correspondence graph}~\cite{rekatsinas:2015}. 
+\begin{figure}
+	\begin{center}
+	\includegraphics[clip,scale=0.25]{fig/kgcg}
+	\caption{An example of a knowledge base and a correspondence graph with two c-cluster nodes corresponding to the population of countries in Asia and sports in the USA.}
+	\label{fig:kgcg}
+	\vspace{-20pt}
+	\end{center}
+\end{figure}
+Specifically, the nodes in the correspondence graph are either data sources (referred to as {\em source nodes}) or c-clusters of concepts and/or entities as dictated by the available sources (called {\em c-cluster nodes}). The edges in the correspondence graph connect each source node with c-cluster nodes and c-cluster nodes with the corresponding concepts and entities in the knowledge base.  Each edge from a source to a c-cluster node is annotated with a quality profile of that source for that specific c-cluster, and each c-cluster node is associated with local information about the dependencies of the data sources that are connected to it. An example of a knowledge base and a correspondence graph is shown in \Cref{fig:kgcg}. There are two c-cluster nodes, one corresponding to the population of countries in Asia and one to sports in the USA. 
+
+The correspondence graph serves as a content and quality index for the available sources. To construct it we first learn the latent c-cluster nodes and then compute the quality profiles and data source dependencies for each c-cluster node. To discover the literals associated with each source entry we use Thomson Reuter's Open Calais\footnote{http://www.opencalais.com/}, an API for semantic annotations with respect to multiple knowledge bases including DBpedia, Freebase and others. To construct the c-cluster nodes we adopt a frequent pattern mining approach based on the FP-growth algorithm~\cite{Han:2000}.  After discovering the c-cluster nodes, we compute the quality of each source with respect to each c-cluster node it is connected to. For the latter, we collectively analyze the content of all sources connected to a c-cluster node following an approach similar to Rekatsinas et al.~\cite{rekatsinas:2014} where samples from all the sources are integrated into a single dataset forming the content of the c-cluster and then each individual sample is compared with the integrated data to compute the source quality. 
 
 \subsection{Specifying and Refining an Integration Task}
 \label{sec:integtask}
-Typically a user would start by proving a description of her desired integration task as well as any requirements (e.g., requirements on the total effort of integration) characterizing the task. We assume that users can describe a desired integration task using a set of context literals that belong in the dictionary $V$. Integration-task requirements can correspond to constraints on the total number of sources used for integration or explicit budget constraints on the cost or total effort of integration.
-
-Given an integration task $I$ described by a  context-literal set $I_c$, the system can {\em recommend}.
-
+\system~allows users to specify their desired integration task via a keyword search interface where keywords are matched against context literals in the knowledge base and correspondence graph. The system offers users with the functionality of exploring literals and sources that are related to their keyword search enabling them to explore similar integration tasks or refine their initial task. \Cref{fig:exploration} shows an example exploration scenario and the corresponding visualizations offered by \system. Consider a user searching data sources that mention things about ``Greece''.  \system~returns a set of relevant literals to the search of the user as well as the most relevant sources with respect to coverage for the specified keyword search. As shown some of the literals related to ``Greece" correspond to the concepts of ``Business and Finance'', ``Environment''', ``Sports'', etc. Given these literals the user may choose to further specialize her search and specify her task as ``Greece, Business, Finance''. As shown in \Cref{fig:exploration}, \system~will update the corresponding visualization with a new set of related literals (here ``Athens'', ``EUR'', ``Bank of Greece'', etc.) and provide the user with an updated set of relevant sources. The user can select any of the recommended sources to view a summary of the literals that the source covers as well as a quality summary of the source for the corresponding keyword search.
+\begin{figure}
+	\begin{center}
+	\includegraphics[trim=0 0 0 60, clip,width=0.48\textwidth]{fig/exploreCor}
+	\caption{An example of a knowledge base and a correspondence graph with two c-cluster nodes corresponding to the population of countries in Asia and sports in the USA.}
+	\label{fig:exploration}
+	\end{center}
+\end{figure}
 
 \subsection{Multi-variate Source Selection}
 \label{sec:sourcesel}
-Given a finalized integration task $I$ associated with a context-literal set $I_c$ the system automatically finds subsets of sources that, if integrated together, maximize the benefit of integration under the budget requirements of the user. If available, the system identifies multiple solutions that correspond to different trade-offs among different quality metrics.
+Once a user has identified the context literal description that fully specifies her integration task (via keyword search), she can perform source selection with respect to that set of literals. As mentioned in \Cref{sec:sources}, source selection considers multiple quality metrics to quantify the benefit of integration. \system~casts source selection as a multi-objective optimization problem and the query engine finds the set of {\em Pareto optimal} solutions corresponding to the source selection problem in hand. Discovering all the solutions on the Pareto front is expensive. To address this issue we solve source selection for different linear combinations of the 
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[trim=0 0 0 85, clip,width=0.48\textwidth]{fig/ssResults}
+	\caption{\system's interface for exploring different source selection solutions.}
+	\label{fig:ssresults}
+	\end{center}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[trim=0 0 0 0, clip,width=0.48\textwidth]{fig/compSS}
+	\caption{Comparing sets of sources.}
+	\label{fig:comparison}
+	\end{center}
+\end{figure}
 
 The discovered solutions are presented to the user together with a concise description of their quality characteristics as well as a description of the data sources included in each of thi think em. 
 
