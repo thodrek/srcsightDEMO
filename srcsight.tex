@@ -53,21 +53,25 @@ Lise Getoor\\
 \maketitle
 
 \begin{abstract}
-Lately there has been a rapid increase in the number of data sources and public access data services, such as cloud-based data markets and data portals, that facilitate the collection, publishing and trading of data. Data sources typically exhibit large heterogeneity in the type and quality of data they provide. Unfortunately, when the number of data sources is large, humans have a limited capability of reasoning about the actual usefulness of sources and the trade-offs between the benefits and costs of acquiring and integrating sources. In this demonstration we present \system, a framework that facilitates the exploration and selection of sources for integration. \system~is based on the intuition that different sets of data sources are optimal to integrate for different integration tasks. The main focus of \system~is on allowing users to discover and explore valuable sets of sources for diverse integration tasks over larger numbers of diverse data sources.
+Lately there has been a rapid increase in the number of data sources and public access data services, such as cloud-based data markets and data portals, that facilitate the collection, publishing and trading of data. Data sources typically exhibit large heterogeneity in the type and quality of data they provide. Unfortunately, when the number of data sources is large, humans have a limited capability of reasoning about the actual usefulness of sources and the trade-offs between the benefits and costs of acquiring and integrating sources. In this demonstration we present \system, a framework that facilitates the exploration and selection of sources for integration. \system~is based on the intuition that different sets of data sources are optimal to integrate for different integration tasks. The main focus of \system~is on allowing users to discover and explore valuable sets of sources for diverse integration tasks over larger numbers of heterogeneous data sources.
 \end{abstract}
 
 
 \section{Introduction}
-Data integration and data cleaning remain among the most cost-intensive tasks in data management, either due to the increased computation and human-labor costs involved in the process~\cite{kruse2015estimating} or the monetary cost involved in acquiring data from different sources~\cite{balazinska:vldb11}. Given the high number of available data sources and the aforementioned costs, it is challenging for a user to identify the sources that are truly beneficial to her application. This gives rise to the natural question of how can one discover {\em the most beneficial sources} for integration, i.e., sources that maximize the user's benefit at the minimum cost. 
+Data integration and data cleaning remain among the most cost-intensive tasks in data management, either due to the increased computation and human-labor costs involved in the process~\cite{kruse2015estimating} or the monetary cost involved in acquiring data~\cite{balazinska:vldb11}. Given the high number of available data sources and the aforementioned costs, it is challenging for a user to identify the sources that are truly beneficial to her application. This gives rise to the natural question of how can one discover {\em the most beneficial sources} for integration, i.e., sources that maximize the user's benefit at the minimum cost. 
 
-Several approaches have been proposed to help users reason about the value of integrating multiple data sources. The proposed approaches can be divided in two main categories: (i) {\em effort-oriented} techniques that focus on characterizing solely the cost of integration, and (ii) data-oriented techniques that reason about the benefit of integration. Techniques from the first category estimate the cost of integration via reasoning about the effort required to perform schema-matching, data-cleaning and data-transformations when integrating multiple sources~\cite{kruse2015estimating, smith:2009}. The main limitation of th Here, the sources are {\em fixed}, assuming that the user has already specified the sources that are relevant to her query and given the estimated integration cost 
+Several approaches have been proposed to help users reason about the value of integrating multiple data sources. The proposed approaches can be divided in two main categories: (i) {\em effort-oriented} techniques that focus on characterizing solely the cost of integration, and (ii) data-oriented techniques that reason about the benefit of integration. Techniques from the first category estimate the cost of integration via reasoning about the effort required to perform schema-matching, data-cleaning and data-transformations when integrating multiple sources~\cite{kruse2015estimating, smith:2009}. While valuable at estimating the overall cost of integration, these techniques do not reason about the actual benefits of integrating multiple sources. On the other hand data-oriented techniques put more emphasis on characterizing the benefit of integrating a new source based on its marginal gain~\cite{dong:vldb13,rekatsinas:2014}. Nevertheless, both approaches usually assume a predefined set of sources, do not support diverse integration tasks and do not allow users to explore and identify which sources are the most beneficial for the desired integration task. 
 
-describe \system and its unique contributions, i.e., functionalities for the users.
+Recently, we introduced our vision for a {\em data source management system} that enables users to discover the most valuable sources for their applications and described a preliminary system design that can support diverse integration scenarios and can help users to truly understand the quality and cost trade-offs between different integration options. In this demonstration proposal, we present \system, a working prototype of such a data source management system. The core of the system is built around the paradigm of {\em source selection}~\cite{dong:vldb13} that allows one to reason about the trade-offs between the gain and cost of integration. The gain of integration can be quantified using a variety of data quality metrics, such as coverage, accuracy, timeliness and bias. \system~offers a number of unique features, as follows:
 
-organization of the demo
+\vspace{5pt}\noindent (1) Users have the capability of describing the domain of their desired integration task using a keyword-based interface. Moreover, the system allows them to explore similar or related domains enabling them to refine the description of their desired task. Simultaneously users have the opportunity to explore sources that are highly relevant to their input task.
 
+\vspace{5pt}\noindent (2) Given a desired integration task, users can perform source selection over a variety of quality metrics. \system~casts source selection as a multi-variate optimization problem to help users understand the actual trade-offs between different quality metrics and proposes multiple sets of sources to be used when different weights are assigned to different quality metrics. 
 
-\newpage
+\vspace{5pt}\noindent (3) Finally, the system allows users to edit the recommended solutions by adding or deleting sources. Users can also perform a qualitative comparison between different sets of sources. This is crucial for evaluating the solutions recommended by \system~and aids users to understand why the particular set of sources was proposed by the system.
+
+In the following sections, we describe the organization of the demonstration. First, we review what it means for a user to discover valuable sources for a specified integration task. Then we present an overview of the architecture of \system~and describe its core functionalities and discuss how they enable effective source selection for diverse integration tasks. Finally, we provide an outline of the \system use cases that attendees will experience during the demo.
+
 \section{Discovering Valuable Sources}
 \label{sec:sources}
 We consider a scenario where users interact with a system that stores and manages data sources under a single repository and want to identify sources relevant to a desired integration task. Examples of such repositories may correspond to data marketplaces~\cite{balazinska:vldb11}, data portals, such as Datasift\footnote{http://datasift.com/}, or online platforms for organizing, managing and sharing datasets~\cite{datahub}. 
@@ -111,6 +115,7 @@ Consider an integration task $I = (I_d, I_c)$ and let $S$ denote the set of all 
 %Perform source selection
 
 \section{{\Large \system} Design}
+\label{sec:design}
 In this section, we present \system, a data source management system for effective source selection over large numbers of diverse data sources. In a recent paper~\cite{rekatsinas:2015}, we put forward our vision about the functionalities that data source management systems should support to facilitate effective source selection and the architecture they should follow. 
 \system~is a realization of our vision for such a system. Next, we describe \system's architecture, the different functionalities it supports and extensions of the preliminary design implemented in \system.%
 
@@ -154,7 +159,7 @@ The correspondence graph serves as a content and quality index for the available
 
 \subsection{Multi-variate Source Selection}
 \label{sec:sourcesel}
-Once a user has identified the context literal description that fully specifies her integration task (via keyword search), she can perform source selection with respect to that set of literals. As mentioned in \Cref{sec:sources}, source selection considers multiple quality metrics to quantify the benefit of integration. \system~casts source selection as a multi-objective optimization problem and the query engine finds the set of {\em Pareto optimal} solutions corresponding to the source selection problem in hand. Discovering all the solutions on the Pareto front is expensive. To address this issue we solve source selection for different linear combinations of the 
+Once a user has identified the context literal description that fully specifies her integration task (via keyword search), she can perform source selection with respect to that set of literals. As mentioned in \Cref{sec:sources}, source selection considers multiple quality metrics to quantify the benefit of integration. \system~casts source selection as a multi-objective optimization problem and the query engine finds the set of {\em Pareto optimal} solutions corresponding to the source selection problem in hand. 
 
 \begin{figure}
 	\begin{center}
@@ -164,6 +169,15 @@ Once a user has identified the context literal description that fully specifies 
 	\end{center}
 \end{figure}
 
+Discovering all the solutions on the Pareto front is expensive as one needs to reason about all the potential trade-offs amongst the available quality metrics. To address this issue we use a {\em sampling} strategy to recover solutions that correspond to different quality trade-offs. More precisely, let $Q$ is the set of quality metrics under consideration and $G_q(\cdot)$ be an oracle computing the gain of integration with respect to quality metric $q \in Q$ for any set of sources. We compute the total gain of integration as a weighted linear combination of the individual gain for each quality metrics, i.e., $G(\cdot) = \sum_{q \in Q} w_q \cdot G_q(\cdot)$. Given this definition of the total gain of integration, we sample different combinations for the weights $w_q$ and solve source selection for each of those. Finally we identify the Pareto optimal solutions amongst the of sampled solutions. 
+
+All the sampled solutions are presented to the user in a way that is easy for her to compare the quality of each solution. The corresponding interface is shown in \Cref{fig:ssresults}. Users can select a particular solution and view a concise summary of the gain and cost of integration achieved by it. Moreover,  users have the flexibility to drill and expand only on a subset of the available quality metrics. This allows them to fully understand specific trade-off across different solutions. Finally, can view a more detailed description of a proposed source selection solution including information such as the sources included in the result and their individual contributions to the quality of the final integration result. 
+
+\subsection{Comparing and Contrasting Sets of Sources}
+\label{sec:extensions}
+Both functionalities presented above were already outlined in our visionary paper on data source management systems~\cite{rekatsinas:2015}. Next, we discuss an additional functionality in \system that enables users to understand why a particular set of sources was recommended to them and evaluate the performance of the system.
+
+\system~allows users to perform a qualitative comparison between two sets of sources with respect to the same integration task. The corresponding interface is shown in \Cref{fig:comparison}. In particular, users will be able to examine how the two sets sets of sources compare against each other with respect to individual quality metrics, as well as the total integration gain and cost. The aforementioned sets of source can either be selected directly from the solutions of source selection or can be manually constructed by the user. \system~offers two ways of manually specifying sets of sources: (i) users can start from a running source selection solution and add recommended sources or remove sources already included in the set, or (ii) users can manually select different sources and construct their own set. The former allows them to examine the neighborhood of the corresponding solution but also serves as a mechanism of convincing the user of the benefit achieved by the output of source selection. To enable the latter \system~provides users with the top-k most relevant sources with respect to their integration task. As users select sources the ranking is revised to contain sources that are more beneficial given the current selection of the user. We point out that the rankings are computed with respect to the individual additional benefit of for each source. 
 \begin{figure}
 	\begin{center}
 	\includegraphics[trim=0 0 0 0, clip,width=0.48\textwidth]{fig/compSS}
@@ -172,38 +186,16 @@ Once a user has identified the context literal description that fully specifies 
 	\end{center}
 \end{figure}
 
-The discovered solutions are presented to the user together with a concise description of their quality characteristics as well as a description of the data sources included in each of thi think em. 
-
-\subsection{Extensions}
-\label{sec:extensions}
-Next, we discuss two extensions that \system.
-\subsubsection{Providing Explanations}
-
-analyze the content of sources, identify the domains that sources cover and materialize quality profiles. 
-
-Different quality metrics available 
-
-Users provide a query that specifies a domain
-
-Oracle provides the quality profiles of sources for the specified domain
-
-Perform source selection
-
-\subsubsection{Comparing and Contrasting Sets of Sources}
-
-
 \section{Demo Details}
+We will demonstrate the functionality of \system~through hands-on experience with two large scale real-world datasets. The data and the system will be stored and running on a remote server and users will interact with the system via a web interface. Our goals are two fold: (i) demonstrate the utility of \system~in exploring and selecting beneficial sources for integration and (ii) demonstrate the effectiveness of automated source selection techniques for diverse scenarios. 
 
-Explore correspondence graph to help users identify the domain of their interest
+\vspace{2pt}\noindent\textbf{Datasets.} The first dataset we will use corresponds to event extractions collected from EventRegistry~\footnote{http://eventregistry.org/}, a repository that monitors news media from all over the world and extras geo-referenced records that correspond to different news articles. Data sources correspond to different news domains and quality metrics such as coverage, timeliness or position bias of the articles are inherently relevant. EventRegistry gets updated in a fixed intervals  by ingesting feeds of newly extracted news articles. We believe that EventRegistry is the right fit to demonstrate the usefulness and practicality of \system~due to the large number of data sources available, the available updates over time and the heterogeneity that sources exhibit both with respect to their domain and their quality. We plan to use a recent snapshot retrieved from EventRegistry containing at least six months worth of news article data. The second dataset we will use corresponds to a Twitter snapshot. Here, individual Twitter users can be viewed as sources. Twitter gives its users an unprecedented ability to deliver news as developments unfold and has been adopted by many researchers as the means of predicting occurrences of events in the future. Hence, we believe that analyzing collections of tweets via \system~to identify sets of ``influential'' or ``trustworthy'' twitter users by employing source selection techniques would of great interest to the conference participants.
 
-Get an initial understanding of what's the quality of relevant sources
+\vspace{2pt}\noindent\textbf{Demonstrating Utility.} Attendees will be able to describe ad-hoc or pre-formulated integration tasks in \system. Then they will have the opportunity to evaluate the source exploration and source selection functionalities offered by \system (described in \Cref{sec:integtask} and \Cref{sec:sourcesel}) with respect to these tasks. Our goal is for users to understand the trade-offs between different quality metrics of sources in both datasets described above and how \system~can guide them to select the most suitable set of sources for their application needs.
 
-Perform source selection and identify sets of sources that optimize for different
-quality metrics
+\vspace{2pt}\noindent\textbf{Demonstrating Effectiveness.} For this part of the demo users will mainly interact with the third functionality of \system, i.e., comparing and contrasting sets of sources. Attendees will have the opportunity to compare sets of sources provided by source selection with manually created sets of sources and understand the quality differences across them. To facilitate manual selection of sources, we will provide users with ranking mechanisms that consider each source in isolation. Starting from the recommended ranked sources users will be able to form their own set of sources and compare it with sets generated by \system. 
 
-Compare user constructed solutions with source-selection solutions
-
-Allow users to remove and add sources
+Overall, the demo will allow users to: (i) understand the internal source indexing mechanism (i.e., the correspondence graph) of our prototype system, (ii) issue queries against it and (iii) explore the corresponding source selection solutions via a web-interface. Users will need to play the role of an analysts and use our system to discover the most valuable sources for their own analysis applications.
 
 \bibliographystyle{abbrv}
 \bibliography{srcsight}
