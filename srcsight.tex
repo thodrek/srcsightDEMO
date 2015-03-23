@@ -14,6 +14,9 @@
 \newcommand\system{\textsc{SourceSight}}
 \newtheorem{definition}{Definition}
 
+\makeatletter
+\def\@copyrightspace{\relax}
+\makeatother
 
 \begin{document}
 
@@ -74,7 +77,7 @@ Recently, we introduced our vision for a {\em data source management system}~\ci
 
 \vspace{2pt}\noindent (3) Finally, the system allows users to edit the recommended solutions by adding or deleting sources. Users can also perform a qualitative comparison between different sets of sources. This is crucial for evaluating the solutions recommended by \system~and aids the users to understand why the particular set of sources was proposed by the system.
 
-\noindent\textbf{Related work.} Over the past few years, the research community has introduced a number of techniques to support search over large numbers of datasets in the form of Web tables~\cite{limaye:2010,dassarma:2012,yakout:2012}. Unlike \system, the proposed techniques focus on providing rankings of datasets and are agnostic to both the effort and gain of integrating multiple datasets. Apart from Web table search, more generic data search systems, such as Microsoft's Power BI~\cite{powerbi}, have been recently proposed. Nonetheless, such systems focus on facilitating data integration and do not provide analysts with the functionality to understand the quality of data sources.
+\noindent\textbf{Related work.} Over the past few years, the research community has introduced a number of techniques to support search over large numbers of datasets in the form of Web tables~\cite{limaye:2010,dassarma:2012,yakout:2012}. Unlike \system, the proposed techniques focus on providing rankings of datasets and are agnostic to both the effort and gain of integrating multiple datasets. Apart from Web table search, more generic data search systems, such as Microsoft's Power BI\footnote{http://www.microsoft.com/en-us/powerbi}, have been recently proposed. Nonetheless, such systems focus on facilitating data integration and do not provide analysts with the functionality to understand the quality of data sources.
 
 %In the following sections, we describe the organization of the demonstration. First, we review what it means for a user to discover valuable sources for a specified integration task (\Cref{sec:sources}). Then we present an overview of the architecture of \system~and describe its core functionalities and discuss how they enable effective source selection for diverse integration tasks (\Cref{sec:design}). Finally, we provide an outline of the \system~use cases that VLDB attendees will experience during the demo (\Cref{sec:details}).
 
@@ -89,7 +92,7 @@ Consider a user that wants to find sources from a repository that are relevant t
 	\caption{Discovering relevant sources and refining an integration task with \system.}
 	\label{fig:exploration}
 	\end{center}
-	\vspace{-22pt}
+	\vspace{-25pt}
 \end{figure}
 
 
@@ -116,17 +119,18 @@ Given this variety of quality metrics, \system~provides the user with multiple s
 Recently, we put forward our vision about the functionalities that data source management systems should support to facilitate effective source selection and the architecture they should follow~\cite{rekatsinas:2015}. 
 \system~is a realization of our vision for such a system. %%Next, we describe \system's architecture, the different functionalities it supports and extensions of the preliminary design implemented in \system.%
 
-\subsection{Architecture overview}
-\system~is built as a layer on top of a data source repository that stores the raw data of data sources. The system consists of three components: a frontend, a source analysis engine and an exploration engine. The frontend is a ``thin client'' that is used to specify integration tasks and display visualizations that aid users to select the sources for integration. The source analysis engine processes the raw data from the available data sources to identify the content of sources, and also evaluates their quality with respect to different quality metrics such as the ones described in the previous section. Finally, the exploration engine takes as input user-specified requests and performs the necessary computation to serve those. The architecture of \system~is presented in \Cref{fig:architecture}. 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.48\textwidth]{fig/srcsightOver}
-    	\vspace{-20pt}
+    \includegraphics[width=0.4\textwidth]{fig/srcsightOver}
+    	\vspace{-10pt}
     \caption{\system~architecture.}
     \label{fig:architecture}
     	\vspace{-10pt}
 \end{figure}
+
+\subsection{Architecture overview}
+\system~is built as a layer on top of a data source repository that stores the raw data of data sources. The system consists of three components: a frontend, a source analysis engine and an exploration engine. The frontend is a ``thin client'' that is used to specify integration tasks and display visualizations that aid users to select the sources for integration. The source analysis engine processes the raw data from the available data sources to identify the content of sources, and also evaluates their quality with respect to different quality metrics such as the ones described in the previous section. Finally, the exploration engine takes as input user-specified requests and performs the necessary computation to serve those. The architecture of \system~is presented in \Cref{fig:architecture}. 
 
 The basic operations of \system~can be divided into an {\em offline} phase and an {\em online} phase. At the offline phase, the source analysis module constructs an index describing both the content and the quality of each source with respect to multiple quality metrics. This index is used during the online phase when a user interacts with the system to serve the user requests. We discuss the indexing technique in more detail in \Cref{sec:reasoning}. At the online phase users interact with \system~via its frontend module and user requests are served by the query engine. Users can specify a desired integration task by providing a keyword-based description of their integration task. Once a description is provided users can choose among three main functionalities with respect to the specified integration task. They can (i) choose to explore which keywords and sources are highly relevant to the specified task, (ii) choose to perform source selection, or (iii) choose to perform a qualitative comparison between different sets of sources constructed either manually or automatically via source selection. %The first functionality allows a user to refine her integration task specification by exploring related contexts. It also allows users to obtain an overview of the quality of individual sources (see \Cref{sec:integtask}). The second functionality returns multiple recommended source selection solutions with respect to a variety of quality metrics (see \Cref{sec:sourcesel}). Finally, \system~allows users to compare and contrast different sets of sources to further understand the benefits of choosing a specific set and understand why the particular set was recommended by source selection (see \Cref{sec:extensions}). We now discuss the different components in detail.
 
@@ -163,7 +167,7 @@ Given an integration task $I = (I_d,I_c)$, the usercan perform source selection 
 
 Discovering all the solutions on the Pareto front is expensive as one needs to reason about all the potential trade-offs amongst the available quality metrics. To address this issue we use a {\em sampling} strategy to recover solutions that correspond to different quality trade-offs. Let $Q$ be the set of quality metrics under consideration and $G_q(\cdot)$ be an oracle computing the gain of integration with respect to quality metric $q \in Q$ for any set of sources. We compute the total gain of integration as a weighted linear combination of the individual gain for each quality metric, i.e., $G(\cdot) = \sum_{q \in Q} w_q \cdot G_q(\cdot)$. Given this definition of the total gain of integration, we sample different combinations for the weights $w_q$ and solve source selection for each of those. Finally, we identify the Pareto optimal solutions amongst the sampled solutions. 
 
-All the sampled solutions are presented to the user in a way that makes it easy for her to compare the quality of each solution. The corresponding interface is shown in \Cref{fig:ssresults}. Users can select a particular solution and view a concise summary of the gain and cost of integration achieved by it. Users can also drill down and expand only on a subset of the available quality metrics to fully understand specific trade-offs across different solutions. Finally, users can view a more detailed description of a source selection solution including information about the sources included in the result and their individual contributions to the quality of the final integration result. 
+All the sampled solutions are presented to the user in a way that makes it easy for her to compare the quality of each solution. The corresponding interface is shown in \Cref{fig:ssresults}. Users can select a particular solution and view a concise summary of the gain and cost of integration achieved by it. Users can also drill down and expand only on a subset of the available quality metrics to fully understand specific trade-offs across different solutions. Finally, users can view a detailed description of a source selection solution with information about the sources included in the result and their individual contributions to the quality of the final integration result. 
 
 \subsection{Comparing sets of sources}
 \label{sec:extensions}
@@ -176,10 +180,11 @@ Both functionalities presented above were alluded to our visionary paper on data
 	\vspace{-20pt}
 	\caption{Comparing sets of sources.}
 	\label{fig:comparison}
-	\vspace{-20pt}
+	\vspace{-25pt}
 	\end{center}
 \end{figure}
 
+\vspace{-5pt}
 \section{Demo Details}
 \label{sec:details}
 We will demonstrate the functionality of \system~through hands-on experience with two real-world datasets. The data will be stored on a remote server and users will interact with the system via a web interface. Our goals are two fold: (i) demonstrate the utility of \system~in exploring and selecting beneficial sources for integration and (ii) demonstrate the effectiveness of automatic source selection for diverse scenarios. 
@@ -196,9 +201,9 @@ The second dataset we will use corresponds to a Twitter snapshot where Twitter u
 
 {\scriptsize
 \begin{thebibliography}{10}
-\bibitem{powerbi}
-Excel Power BI.
-\newblock \url{http://www.microsoft.com/en-us/powerbi}.
+%\bibitem{powerbi}
+%Excel Power BI.
+%\newblock \url{http://www.microsoft.com/en-us/powerbi}.
 
 \bibitem{balazinska:vldb11}
 M.~Balazinska, B.~Howe, and D.~Suciu.
