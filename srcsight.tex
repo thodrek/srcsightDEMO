@@ -25,6 +25,9 @@
 \isbn{978-1-4503-3531-7/16/06}\acmPrice{\$15.00}
 \doi{http://dx.doi.org/10.1145/2882903.2899403}
 
+\clubpenalty=10000 
+\widowpenalty = 10000
+
 \title{{\LARGE \system}: Enabling Effective Source Selection}
 
 \numberofauthors{3} 
@@ -168,7 +171,7 @@ Given an integration task $I = (I_d,I_c)$, the user can perform source selection
 
 Discovering all the solutions on the Pareto front is expensive as one needs to reason about all the potential trade-offs amongst the available quality metrics. To address this issue we use a sampling strategy to discover solutions that correspond to different quality trade-offs. Let $Q$ be the set of quality metrics under consideration and $B_q(\cdot)$ be an oracle computing the benefit of integration with respect to quality metric $q \in Q$ for any set of sources. We compute the total benefit of integration as a weighted linear combination of the individual benefit of each quality metric, i.e., $B(\cdot) = \sum_{q \in Q} w_q \cdot B_q(\cdot)$. Given this definition of the total benefit of integration, we sample different combinations of the weights $w_q$ and solve source selection for each of those. Finally, we identify the Pareto optimal solutions amongst the sampled solutions. 
 
-The sampled solutions are presented to the user in a way that makes it easy for her to compare the quality of each solution. The corresponding interface is shown in \Cref{fig:ssresults}. Users can select a particular solution and view a concise summary of the benefit and cost of integration achieved by it. Users can also drill down and expand only on a subset of the available quality metrics to fully understand specific trade-offs across different solutions. Finally, users can view a detailed description of a source selection solution with information about the sources included in the result and their individual contributions to the quality of the final integration result. 
+The sampled solutions are presented to the user in a way that makes it easy to compare the quality of each solution. The corresponding interface is shown in \Cref{fig:ssresults}. Users can select a particular solution and view a concise summary of the benefit and cost of integration achieved by it. Users can also drill down and expand only on a subset of the available quality metrics to fully understand specific trade-offs across different solutions. Finally, users can view a detailed description of a source selection solution with information about the sources included in the result and their individual contributions to the quality of the final integration result. 
 
 \subsection{Comparing sets of sources}
 \label{sec:extensions}
